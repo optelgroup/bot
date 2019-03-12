@@ -40,10 +40,18 @@ func parse(s string, channel *ChannelData, user *User) (*Cmd, error) {
 
 	if len(pieces) > 1 {
 		// get the arguments and remove extra spaces
+		var (
+			parsedArgs []string
+			err        error
+		)
 		c.RawArgs = strings.TrimSpace(pieces[1])
-		parsedArgs, err := shellwords.Parse(c.RawArgs)
-		if err != nil {
-			return nil, errors.New("Error parsing arguments: " + err.Error())
+		if strings.Contains(c.RawArgs, "|") {
+			parsedArgs = strings.Split(c.RawArgs, " ")
+		} else {
+			parsedArgs, err = shellwords.Parse(c.RawArgs)
+			if err != nil {
+				return nil, errors.New("Error parsing arguments: " + err.Error())
+			}
 		}
 		c.Args = parsedArgs
 	}
